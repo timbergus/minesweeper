@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minesweeper</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1 style="text-align: center">Minesweeper</h1>
+    <div id="root"></div>
+    <script type="module">
+      import init, {
+        getState,
+        openField,
+        toggleFlag,
+      } from "./pkg/minesweeper.js";
+
+      await init();
+
+      const root = document.getElementById("root");
+
+      function openCell(x, y) {
+        openField(x, y);
+        render();
+      }
+
+      function flagCell(x, y) {
+        toggleFlag(x, y);
+        render();
+      }
+
+      function render() {
+        let data = getState()
+          .trim()
+          .split("\n")
+          .map((row) => row.trim().split(" "));
+
+        root.innerText = "";
+
+        const panel = document.createElement("div");
+        panel.className = "panel";
+        panel.style.gridTemplateRows = `repeat(${data.length}, auto)`;
+        panel.style.gridTemplateColumns = `repeat(${data[0].length}, auto)`;
+
+        for (let y = 0; y < data.length; y++) {
+          for (let x = 0; x < data[y].length; x++) {
+            let element = document.createElement("div");
+            element.className = "cell";
+            element.addEventListener("click", () => {
+              event.preventDefault();
+              openCell(x, y);
+            });
+            element.addEventListener("contextmenu", (event) => {
+              event.preventDefault();
+              flagCell(x, y);
+            });
+            element.innerText = data[y][x];
+            panel.appendChild(element);
+          }
+        }
+
+        root.appendChild(panel);
+      }
+
+      render();
+    </script>
+  </body>
+</html>
